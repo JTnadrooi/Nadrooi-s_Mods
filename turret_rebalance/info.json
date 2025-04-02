@@ -1,0 +1,19 @@
+{
+    "name": "turret_rebalance",
+    "version": "0.1.03",
+    "title": "Turret Rebalance",
+    "author": "JTnadrooi",
+    "contact": "@jtnadrooi",
+    "homepage": "https://github.com/JTnadrooi/Nadrooi's_Mods",
+    "factorio_version": "2.0",
+    "dependencies": [
+        "base >= 2.0",
+        "space-age",
+        "? vtk-cannon-turret",
+        "(?) naval-turrets",
+        "(?) Additional-Turret-revived",
+        "galore_lib"
+    ],
+    "description": "Rebalances turrets from military mods to fit better with space age space platforms.",
+    "space_travel_required": true
+}

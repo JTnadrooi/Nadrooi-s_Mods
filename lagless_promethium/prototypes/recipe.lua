@@ -1,0 +1,1 @@
+vgal = vgal or {}

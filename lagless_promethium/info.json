@@ -1,0 +1,18 @@
+{
+    "name": "lagless_promethium",
+    "version": "0.1.0",
+    "title": "Lagless Promethium",
+    "author": "JTnadrooi",
+    "contact": "@jtnadrooi",
+    "homepage": "https://github.com/JTnadrooi/Nadrooi's_Mods",
+    "factorio_version": "2.0",
+    "dependencies": [
+        "base >= 2.0",
+        "space-age",
+        "galore_lib",
+        "(?) VFSteeperQualityWithMythic",
+        "(?) Age-of-Production"
+    ],
+    "description": "Enables alternate ways of getting promethium, or just removes it outright. Highly customisable!",
+    "space_travel_required": true
+}
