@@ -4,7 +4,7 @@
     "title": "Nothing Is To Heavy",
     "author": "JTnadrooi",
     "contact": "@jtnadrooi",
-    "homepage": "https://github.com/JTnadrooi/Nadrooi's_Mods",
+    "homepage": "https://github.com/JTnadrooi/Nadrooi-s_Mods",
     "factorio_version": "2.0",
     "dependencies": ["base >= 2.0", "space-age"],
     "description": "Makes it so everything fits in a rocket at least once.",
