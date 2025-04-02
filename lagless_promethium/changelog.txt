@@ -1,4 +1,4 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.1.0
+Version: 1.0.0
   Features:
     - Initial release. Icon source: https://www.svgrepo.com/svg/323562/upgrade
