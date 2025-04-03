@@ -1,0 +1,23 @@
+-- if settings.startup["lp-promethium-from-asteroid-chunks"].value then
+--     vgal.data.extend({
+--         {
+--             type = "recipe",
+--             name = "promethium-from-asteroid-chunks",
+--             prefix = "lp",
+--             icons = vgal.icon.register {
+--                 vgal.icon.get("promethium-asteroid-chunk"),
+--             },
+--             technology = "promethium-science-pack",
+--             category = "crushing",
+--             energy_required = 2,
+--             ingredients = {
+--                 { "carbonic-asteroid-chunk", 1 },
+--                 { "metallic-asteroid-chunk", 1 },
+--                 { "oxide-asteroid-chunk",    1 },
+--             },
+--             results = {
+--                 { "promethium-asteroid-chunk", 1 },
+--             },
+--         },
+--     })
+-- end
