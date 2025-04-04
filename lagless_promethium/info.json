@@ -13,6 +13,6 @@
         "(?) VFSteeperQualityWithMythic",
         "(?) Age-of-Production"
     ],
-    "description": "Enables alternate ways of getting promethium, or just removes it outright. Highly customisable!",
+    "description": "Removes promethium, highly customisable!",
     "space_travel_required": true
 }
