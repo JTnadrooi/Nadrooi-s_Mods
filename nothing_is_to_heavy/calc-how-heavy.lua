@@ -1,90 +1,97 @@
-local defaultWeight = data.raw["utility-constants"].default.default_item_weight
-local defaultWeightCoefficient = 0.5
-local rocket_lift_weight = data.raw["utility-constants"].default.rocket_lift_weight
+local constants           = data.raw["utility-constants"].default
+local DEFAULT_WEIGHT      = constants.default_item_weight
+local DEFAULT_COEFFICIENT = 0.5
+local ROCKET_LIFT_WEIGHT  = constants.rocket_lift_weight
 
-local function getWeight(itemName, seen, depth)
-    seen = seen or {}
-    depth = depth or 1
-    if seen[itemName] then -- for when starting a loop
-        return { weight = defaultWeight, startLoop = seen[itemName]}
+-- Helper: check if an item has a specific flag
+local function has_flag(item, flag_name)
+    if not item.flags then return false end
+    for _, flag in ipairs(item.flags) do
+        if flag == flag_name then
+            return true
+        end
     end
-    seen[itemName] = depth
+    return false
+end
 
-    if data.raw["fluid"][itemName] ~= nil then -- if the item is a fluid, return 100
+-- Recursive weight computation
+local function compute_weight(item_name, seen, depth)
+    seen  = seen or {}
+    depth = depth or 1
+
+    -- Detect recursion loop
+    if seen[item_name] then
+        return { weight = DEFAULT_WEIGHT, startLoop = seen[item_name] }
+    end
+    seen[item_name] = depth
+
+    -- Fluids have fixed weight
+    if data.raw.fluid[item_name] then
         return { weight = 100 }
     end
-    local tmpItem = data.raw["item-with-entity-data"][itemName] -- for spidertrons and more
-    if tmpItem ~= nil then
-        if tmpItem.weight then
-            return { weight = tmpItem.weight}
-        end
-    end
-    local tmpItem = data.raw["tool"][itemName] -- for sciencepacks and more
-    if tmpItem ~= nil then
-        if tmpItem.weight then
-            return { weight = tmpItem.weight}
-        end
-    end
-    
-    local item = data.raw["item"][itemName]
-    if item == nil then
-        error("item is nog an item")
-    end
-    if item.flags then
-        for _, flag in pairs(item.flags) do
-            if flag == "spawnable" then
-                return { weight = 0 }
-            end
-            if flag == "only-in-cursor" then
-                return { weight = 0 }
-            end
-        end
+
+    -- Entity-data tools (e.g. spidertron) or standard tools
+    local special = data.raw["item-with-entity-data"][item_name]
+        or data.raw.tool[item_name]
+    if special and special.weight then
+        return { weight = special.weight }
     end
 
+    -- Standard items
+    local item = data.raw.item[item_name]
+    if not item then
+        error("Invalid item: " .. tostring(item_name))
+    end
 
-    if item.weight then-- some are already set, but this may be nil
+    -- Zero-weight spawn-only items
+    if has_flag(item, "spawnable") or has_flag(item, "only-in-cursor") then
+        return { weight = 0 }
+    end
+
+    -- Already assigned weight
+    if item.weight then
         return { weight = item.weight }
     end
 
-    local recipe = data.raw["recipe"][itemName]
-    local weight = 0;
-    for _, ingredients in pairs(recipe.ingredients) do -- for each ingredient in the recipe
-        local ingredientWeight = getWeight(ingredients.name, table.deepcopy(seen))
-        if ingredientWeight.startLoop then
-            if ingredientWeight.startLoop >= depth then
-                return { weight = defaultWeight, startLoop = ingredientWeight.startLoop}
-            end
+    -- Derive from recipe ingredients
+    local recipe = data.raw.recipe[item_name]
+    local total_ing_weight = 0
+
+    for _, ing in ipairs(recipe.ingredients) do
+        local result = compute_weight(ing.name, table.deepcopy(seen), depth + 1)
+        -- Propagate loop detection
+        if result.startLoop and result.startLoop >= depth then
+            return { weight = DEFAULT_WEIGHT, startLoop = result.startLoop }
         end
-        weight = weight + ingredients.amount * ingredientWeight.weight
+        total_ing_weight = total_ing_weight + ing.amount * result.weight
     end
 
-    if weight == 0 then -- if mostly to prevent if there are no ingredients in the recipe
-        -- item.weight = defaultWeight
-        return { weight = defaultWeight }
+    if total_ing_weight == 0 then
+        return { weight = DEFAULT_WEIGHT }
     end
 
-    local intermediateResult
-    if item.ingredient_to_weight_coefficient then
-        intermediateResult = weight * item.ingredient_to_weight_coefficient
-    else
-        intermediateResult = weight * defaultWeightCoefficient
-    end
+    -- Apply conversion coefficient
+    local coeff = item.ingredient_to_weight_coefficient or DEFAULT_COEFFICIENT
+    local computed = total_ing_weight * coeff
 
-    if recipe.allow_productivity ~= true then
-        local simpleResult = rocket_lift_weight / item.stack_size
-        if(simpleResult >= weight) then
-            -- item.weight = simpleResult
-            return { weight = simpleResult }
+    -- If not productivity-allowed, consider simple rocket rule
+    if not recipe.allow_productivity then
+        local simple = ROCKET_LIFT_WEIGHT / item.stack_size
+        if simple >= total_ing_weight then
+            return { weight = simple }
         end
     end
-    local stack_count = rocket_lift_weight / intermediateResult / item.stack_size
-    if(stack_count <= 1) then
-        return { weight = intermediateResult }
-    end
-    weight = rocket_lift_weight / math.floor(stack_count) / item.stack_size
-    -- item.weight = weight
-    return { weight = weight }
 
+    -- Normalize weight to rocket lift and stack size
+    local stacks = ROCKET_LIFT_WEIGHT / computed / item.stack_size
+    if stacks <= 1 then
+        return { weight = computed }
+    end
+
+    local final_weight = ROCKET_LIFT_WEIGHT
+        / math.floor(stacks)
+        / item.stack_size
+    return { weight = final_weight }
 end
 
---bloemgamer
+return compute_weight
