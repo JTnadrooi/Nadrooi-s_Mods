@@ -50,7 +50,7 @@ local function compute_weight(item_name, seen, depth)
     local recipe = data.raw.recipe[item_name]
     local total_ing_weight = 0
 
-    if not recipe then
+    if not recipe then -- THIS IS WRONG
         return { weight = DEFAULT_WEIGHT }
     end
 
