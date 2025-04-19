@@ -30,15 +30,8 @@ local function compute_weight(item_name, seen, depth)
         return { weight = 100 }
     end
 
-    -- Entity-data tools (e.g. spidertron) or standard tools
-    local special = data.raw["item-with-entity-data"][item_name]
-        or data.raw.tool[item_name]
-    if special and special.weight then
-        return { weight = special.weight }
-    end
-
     -- Standard items
-    local item = data.raw.item[item_name]
+    local item = vgal.any(item_name)
     if not item then
         error("Invalid item: " .. tostring(item_name))
     end
