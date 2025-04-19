@@ -50,6 +50,10 @@ local function compute_weight(item_name, seen, depth)
     local recipe = data.raw.recipe[item_name]
     local total_ing_weight = 0
 
+    if not recipe then
+        return { weight = DEFAULT_WEIGHT }
+    end
+
     for _, ing in ipairs(recipe.ingredients) do
         local result = compute_weight(ing.name, table.deepcopy(seen), depth + 1)
         -- Propagate loop detection
@@ -87,8 +91,22 @@ local function compute_weight(item_name, seen, depth)
     return { weight = final_weight }
 end
 
-for _, item in pairs(data.raw["item"]) do
-    if item.weight and (item.weight > 1000000) then
-        item.weight = 1000000
+
+local function do_table(tableName)
+    for _, item in pairs(data.raw[tableName]) do
+        local w = compute_weight(item.name).weight
+        if w > ROCKET_LIFT_WEIGHT then
+            item.weight = ROCKET_LIFT_WEIGHT
+        end
     end
 end
+
+do_table("item")
+do_table("tool")
+do_table("ammo")
+do_table("module")
+do_table("capsule")
+do_table("repair-tool")
+do_table("armor")
+do_table("item-with-entity-data")
+do_table("rail-planner")
