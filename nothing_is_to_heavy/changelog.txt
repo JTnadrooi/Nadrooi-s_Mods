@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+  Features:
+    - Fixed crash caused by recipe ingredients not existing (yet).
+---------------------------------------------------------------------------------------------------
 Version: 2.1.0
   Features:
     - Now it actually works for EVERY item.
