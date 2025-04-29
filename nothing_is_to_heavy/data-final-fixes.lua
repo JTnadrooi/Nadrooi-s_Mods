@@ -31,7 +31,8 @@ local function compute_weight(item_name, seen, depth)
     end
 
     -- standard items
-    local item = vgal.any(item_name)
+    local success, item = pcall(vgal.any, item_name)
+    if not success then return { weight = DEFAULT_WEIGHT } end
     if not item then
         error("Invalid item: " .. item_name)
     end
